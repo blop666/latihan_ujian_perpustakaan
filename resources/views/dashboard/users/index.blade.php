@@ -1,12 +1,12 @@
 @extends('be.master')
 
-<!-- Menu Section ( from be/master ) -->
 @section('menu')
     @include('be.menu')
 @endsection
 
 
 @section('main')
+
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
         navbar-scroll="true">
         <div class="container-fluid py-1 px-3">
@@ -137,119 +137,8 @@
             </div>
         </div>
     </nav>
-
+    
     <div class="container-fluid py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-header bg-gradient-dark text-white rounded-top-4">
-                        <h5 class="mb-0">Tambah Data Peminjam</h5>
-                    </div>
-
-                    <div class="card-body p-4">
-
-                        <form action="{{ route('userBorrow.store') }}" method="POST">
-                            @csrf
-
-                            <div class="row">
-
-                                <!-- Nama -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nama Peminjam</label>
-                                    <input type="text" name="nama_peminjam" class="form-control" required>
-                                </div>
-
-                                <!-- Jenis Kelamin -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Jenis Kelamin</label>
-                                    <select name="jk" class="form-control" required>
-                                        <option value="">-- Pilih --</option>
-                                        <option value="L">Laki-laki</option>
-                                        <option value="P">Perempuan</option>
-                                    </select>
-                                </div>
-
-                                <!-- Alamat (date sesuai validasi kamu) -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Alamat</label>
-                                    <input type="input" name="alamat" class="form-control" required>
-                                </div>
-
-                                <!-- No Telpon -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">No Telepon</label>
-                                    <input type="text" name="no_telpon" class="form-control" required>
-                                </div>
-
-                                <!-- Email -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-control" required>
-                                </div>
-
-                                <!-- Status -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Status</label>
-                                    <select name="status" class="form-control" required>
-                                        <option value="">-- Pilih Status --</option>
-                                        <option value="siswa">Siswa</option>
-                                        <option value="guru">Guru</option>
-                                        <option value="tendik">Tendik</option>
-                                        <option value="umum">Umum</option>
-                                    </select>
-                                </div>
-
-                                <!-- Foto -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Foto</label>
-                                    <input type="file" name="foto" class="form-control shadow-none">
-                                </div>
-
-                                <!-- NIP -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">NIP</label>
-                                    <input type="text" name="nip" class="form-control" required>
-                                </div>
-
-                                <!-- NISN -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">NISN</label>
-                                    <input type="text" name="nisn" class="form-control" required>
-                                </div>
-
-                                <!-- Kelas -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Kelas</label>
-                                    <input type="text" name="kelas" class="form-control" required>
-                                </div>
-
-                                <!-- Tahun Ajaran -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Tahun Ajaran</label>
-                                    <input type="text" name="tahun_ajaran" class="form-control"
-                                        placeholder="2025/2026" required>
-                                </div>
-
-                            </div>
-
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" class="btn bg-gradient-dark px-4">
-                                    Submit
-                                </button>
-                            </div>
-                            
-                        </form>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
+        @include('dashboard.users.table')
     </div>
 @endsection

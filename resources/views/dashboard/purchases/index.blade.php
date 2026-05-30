@@ -141,4 +141,6 @@
     <div class="container-fluid py-4">
         @include('dashboard.purchases.table')
     </div>
+
+    
 @endsection

@@ -22,6 +22,7 @@
                         </thead>
                         <tbody>
                             @foreach ($borrows as $borrow)
+                            
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $borrow->nama_peminjam }}</td>
@@ -94,11 +95,11 @@
                                             <div class="dropdown-menu-custom">
                                                 <a href="{{ route('borrow.edit', $borrow->id) }}">Edit</a>
 
-                                                <form action="{{ route('borrow.destroy', $borrow->id) }}"
+                                                <form action="{{ route('userBorrow.destroy', $borrow->id) }}"
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="delete-btn" onclick="confirmDelete(this)">
+                                                    <button type="button" class="delete-btn" onclick="confirmDelete(this)">
                                                         Delete
                                                     </button>
                                                 </form>

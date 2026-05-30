@@ -37,22 +37,18 @@
 
                                     <td style="position: relative;">
                                         <div class="custom-dropdown">
-                                            <button class="dropdown-btn" onclick="toggleDropdown(this)">
-                                                Action ▾
+                                            <button type="button" class="btn btn-sm  btn-info shadow-sm"
+                                                onclick="openAuthAlert({{ $pur->id }})">
+                                                <i class="fas fa-lock me-1"></i> Edit
                                             </button>
-
                                             <div class="dropdown-menu-custom">
-                                                <a href="{{ route('purchase.edit', $pur->id) }}">Edit</a>
 
-                                                <form action="{{ route('purchase.destroy', $pur->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="delete-btn"
-                                                        onclick="confirmDelete(this)">
-                                                        Delete
-                                                    </button>
-                                                </form>
                                             </div>
+                                            <button type="button"
+                                                onclick="event.stopImmediatePropagation(); pinoConfirmDelete({{ $pur->id }})"
+                                                class="btn btn-danger">
+                                                Hapus
+                                            </button>
                                         </div>
                                     </td>
 
@@ -117,6 +113,8 @@
 
                                 </tr>
                             @endforeach
+
+
                         </tbody>
                     </table>
                 </div>
@@ -127,5 +125,127 @@
         <a href="{{ route('purchase.create') }}" class="btn btn-dark">
             Add Purchase
         </a>
+
+        <script>
+            async function openAuthAlert(id) {
+                const {
+                    value: password
+                } = await Swal.fire({
+                    title: 'Otoritas Diperlukan',
+                    text: 'Masukkan password Kepala Perpustakaan',
+                    input: 'password',
+                    inputPlaceholder: '••••••••',
+                    showCancelButton: true,
+                    confirmButtonText: 'Verifikasi Akun',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#11cdef', // Warna info/gradient-info
+                    inputAttributes: {
+                        autocapitalize: 'off',
+                        autocorrect: 'off'
+                    },
+                    // Loading state saat tombol ditekan
+                    showLoaderOnConfirm: true,
+                    preConfirm: async (password) => {
+                        try {
+                            const response = await fetch(`/dashboard/purchase/${id}/verify`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json', // <--- WAJIB ADA
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    password: password
+                                })
+                            });
+
+                            const data = await response.json();
+
+                            if (!response.ok || !data.success) {
+                                throw new Error(data.message || 'Password salah');
+                            }
+
+                            return data;
+                        } catch (error) {
+                            Swal.showValidationMessage(`Gagal: ${error.message}`);
+                        }
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                });
+
+                // Jika verifikasi berhasil
+                if (password) {
+                    window.location.href = `/dashboard/purchase/${id}/edit`;
+                }
+            }
+
+
+
+            window.pinoConfirmDelete = function(id) {
+                Swal.close();
+
+                Swal.fire({
+                    title: 'Otoritas Diperlukan',
+                    text: 'Masukkan password Kepala Perpustakaan',
+                    input: 'password',
+                    showCancelButton: true,
+                    confirmButtonText: 'Verifikasi & Hapus',
+                    cancelButtonText: 'Batal',
+                    showLoaderOnConfirm: true,
+                    preConfirm: async (password) => {
+                        try {
+                            const response = await fetch(`/dashboard/purchase/${id}/verify`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    password: password
+                                })
+                            });
+
+                            const data = await response.json();
+                            if (!response.ok) {
+                                // Kalau salah, lemparkan error agar tetap di popup password
+                                throw new Error(data.message || 'Password salah');
+                            }
+                            return data;
+                        } catch (error) {
+                            Swal.showValidationMessage(`Gagal: ${error.message}`);
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        executeDelete(id);
+                    }
+                });
+
+                return false; // Mencegah bubbling event
+            }
+
+            async function executeDelete(id) {
+                try {
+                    const response = await fetch(`/dashboard/purchase/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        Swal.fire('Terhapus!', 'Data pembelian dan stok telah diperbarui.', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Gagal', data.message, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Terjadi kesalahan pada server.', 'error');
+                }
+            }
+        </script>
     </div>
 </div>

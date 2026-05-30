@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\peminjam;
 use App\Models\peminjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 
 
@@ -35,6 +36,8 @@ class UserPeminjamController extends Controller
      */
     public function store(Request $request)
     {
+
+
         $validated = $request->validate([
             'nama_peminjam' => 'required|string|max:255',
             'jk' => 'required|string|max:30',
@@ -43,7 +46,7 @@ class UserPeminjamController extends Controller
             'email' => 'required|string|max:50',
             'password' => 'required|string|max:30',
             'status' => 'required',
-            'foto' => 'required|string|max:200',
+            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             'nip' => 'required|string|max:200',
             'nisn' => 'required|string|max:50',
             'kelas' => 'required|string|max:50',
@@ -51,7 +54,14 @@ class UserPeminjamController extends Controller
         ]);
 
 
+        $validated['password'] = Hash::make($request->password); // Enkripsi password
+
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('user_borrow_photos', 'public');
+        }
+
         peminjam::create($validated);
+
 
         Alert::success('Berhasil', 'User Berhasil Ditambahkan');
 
@@ -74,12 +84,11 @@ class UserPeminjamController extends Controller
      */
     public function edit(string $id)
     {
-        $title = "Borrow";
+        $title = "userBorrow";
 
 
         $borrow = peminjam::findOrFail($id);
         return view('dashboard.userBorrow.edit', compact('title', 'borrow'));
-        
     }
 
     /**
@@ -114,12 +123,12 @@ class UserPeminjamController extends Controller
     public function destroy(string $id)
     {
         $title = "Borrow";
-        $borrow = peminjam::findOrFail($id);
-        $borrow->delete();
+        $peminjam = peminjam::findOrFail($id);
+        $peminjam->delete();
 
         Alert::warning('Dihapus', 'Data Berhasil Diapus');
 
-        return redirect()->route('borrow.index');
-
+        $title = "userBorrow";
+        return redirect()->route('userBorrow.index', compact('title'));
     }
 }

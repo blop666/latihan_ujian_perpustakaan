@@ -107,11 +107,18 @@ class BorrowController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) {}
+    public function destroy(string $id) {
+        $borrow = peminjaman::findOrFail($id);
+        $borrow->delete();
+        // $detail_borrow->delete();
+        $title = 'Borrow';
+        return view('dashboard.borrow.index', compact('title'));
+    }
+
 }

@@ -138,117 +138,82 @@
         </div>
     </nav>
 
+    <!-- users/index.blade.php -->
     <div class="container-fluid py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-header bg-gradient-dark text-white rounded-top-4">
-                        <h5 class="mb-0">Tambah Data Peminjam</h5>
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                        <h6>Tabel Petugas Perpustakaan</h6>
+                        <!-- Tombol Add New User -->
+                        <a href="{{ route('users.create') }}" class="btn bg-gradient-dark btn-sm mb-0">
+                            <i class="fas fa-plus me-2"></i>Add New User
+                        </a>
                     </div>
-
-                    <div class="card-body p-4">
-
-                        <form action="{{ route('userBorrow.store') }}" method="POST">
-                            @csrf
-
-                            <div class="row">
-
-                                <!-- Nama -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nama Peminjam</label>
-                                    <input type="text" name="nama_peminjam" class="form-control" required>
-                                </div>
-
-                                <!-- Jenis Kelamin -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Jenis Kelamin</label>
-                                    <select name="jk" class="form-control" required>
-                                        <option value="">-- Pilih --</option>
-                                        <option value="L">Laki-laki</option>
-                                        <option value="P">Perempuan</option>
-                                    </select>
-                                </div>
-
-                                <!-- Alamat (date sesuai validasi kamu) -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Alamat</label>
-                                    <input type="input" name="alamat" class="form-control" required>
-                                </div>
-
-                                <!-- No Telpon -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">No Telepon</label>
-                                    <input type="text" name="no_telpon" class="form-control" required>
-                                </div>
-
-                                <!-- Email -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-control" required>
-                                </div>
-
-                                <!-- Status -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Status</label>
-                                    <select name="status" class="form-control" required>
-                                        <option value="">-- Pilih Status --</option>
-                                        <option value="siswa">Siswa</option>
-                                        <option value="guru">Guru</option>
-                                        <option value="tendik">Tendik</option>
-                                        <option value="umum">Umum</option>
-                                    </select>
-                                </div>
-
-                                <!-- Foto -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Foto</label>
-                                    <input type="file" name="foto" class="form-control shadow-none">
-                                </div>
-
-                                <!-- NIP -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">NIP</label>
-                                    <input type="text" name="nip" class="form-control" required>
-                                </div>
-
-                                <!-- NISN -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">NISN</label>
-                                    <input type="text" name="nisn" class="form-control" required>
-                                </div>
-
-                                <!-- Kelas -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Kelas</label>
-                                    <input type="text" name="kelas" class="form-control" required>
-                                </div>
-
-                                <!-- Tahun Ajaran -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Tahun Ajaran</label>
-                                    <input type="text" name="tahun_ajaran" class="form-control"
-                                        placeholder="2025/2026" required>
-                                </div>
-
-                            </div>
-
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" class="btn bg-gradient-dark px-4">
-                                    Submit
-                                </button>
-                            </div>
-                            
-                        </form>
-
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            User</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Role</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Joined</th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($users as $user)
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div>
+                                                        <!-- Render Foto Profil -->
+                                                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : asset('be/assets/img/team-2.jpg') }}"
+                                                            class="avatar avatar-sm me-3" alt="user photo">
+                                                    </div>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">{{ $user->username }}</h6>
+                                                        <p class="text-xs text-secondary mb-0">{{ $user->email }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <!-- Badge Status Role -->
+                                                <span
+                                                    class="badge badge-sm {{ $user->role == 'kepala perpustakaan' ? 'bg-gradient-success' : 'bg-gradient-secondary' }}">
+                                                    {{ $user->role == 'kepala perpustakaan' ? 'Kepala' : 'Pustakawan' }}
+                                                </span>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">{{ $user->created_at->format('d/m/Y') }}</span>
+                                            </td>
+                                            <td class="align-middle text-right px-4">
+                                                <a href="{{ route('users.edit', $user->id) }}"
+                                                    class="text-secondary font-weight-bold text-xs me-3"
+                                                    data-toggle="tooltip">
+                                                    Edit
+                                                </a>
+                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf @method('DELETE')
+                                                    <button type="button"
+                                                        class="border-0 bg-transparent text-danger font-weight-bold text-xs"
+                                                        onclick="return confirm('Hapus user ini?')">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

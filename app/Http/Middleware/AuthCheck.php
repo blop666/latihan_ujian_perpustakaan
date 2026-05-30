@@ -16,10 +16,18 @@ class AuthCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!Auth::guard('peminjam')->check()) {
-            return redirect()->route('login.index');
-        };
+        // Cek apakah sudah login
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
 
-        return $next($request);
+        $user = Auth::user();
+        // Proteksi Dashboard: Hanya role tertentu yang bisa lewat
+        if ($user->role === 'kepala perpustakaan' || $user->role === 'perpustakaan') {
+            return $next($request);
+        }
+
+        // Jika user adalah peminjam (dari tabel lain/role lain), lempar balik
+        return redirect('/')->with('error', 'Anda tidak punya akses ke Dashboard.');
     }
 }

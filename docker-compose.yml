@@ -1,0 +1,44 @@
+services:
+  app:
+    build: .
+    container_name: perpustakaan_app
+    restart: unless-stopped
+    volumes:
+      - ./var/www/html
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=dbperpustakaan
+      - DB_USERNAME=root
+      - DB_PASSWORD=123
+      - SESSION_DRIVER=database
+      - CACHE_STORE=database
+      - QUEUE_CONNECTION=database
+    depends_on:
+      - db
+
+  web:
+    image: nginx:alpine
+    container_name: perpustakaan_web
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./var/www/html
+      - ./nginx-container.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+  
+  db:
+    image: mariadb:10.11
+    container_name: perpustakaan_db
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=dbperpustakaan
+      - MYSQL_ROOT_PASSWOD=123
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:

@@ -37,7 +37,7 @@
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="delete-btn" onclick="confirmDelete(this)">
+                                                    <button type="button" class="delete-btn" onclick="confirmDelete(this)">
                                                         Delete
                                                     </button>
                                                 </form>

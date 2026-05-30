@@ -140,115 +140,83 @@
 
     <div class="container-fluid py-4">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-
+            <div class="col-lg-7">
                 <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-header bg-gradient-dark text-white rounded-top-4">
-                        <h5 class="mb-0">Tambah Data Peminjam</h5>
+                    <div class="card-header bg-gradient-dark text-white p-4">
+                        <h5 class="mb-0 text-white">{{ isset($user) ? 'Edit User' : 'Add New User' }}</h5>
+                        <p class="text-sm mb-0">Pastikan data yang dimasukkan sudah benar.</p>
                     </div>
-
                     <div class="card-body p-4">
-
-                        <form action="{{ route('userBorrow.store') }}" method="POST">
+                        <form action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}"
+                            method="POST" enctype="multipart/form-data">
                             @csrf
+                            @if (isset($user))
+                                @method('PUT')
+                            @endif
 
                             <div class="row">
-
-                                <!-- Nama -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nama Peminjam</label>
-                                    <input type="text" name="nama_peminjam" class="form-control" required>
+                                <!-- Field Username -->
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label text-uppercase text-xs font-weight-bolder">Username</label>
+                                    <input type="text" name="username"
+                                        class="form-control @error('username') is-invalid @enderror"
+                                        value="{{ old('username', $user->username ?? '') }}">
+                                    @error('username')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
-                                <!-- Jenis Kelamin -->
+                                <!-- Field Email -->
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label text-uppercase text-xs font-weight-bolder opacity-7">Email
+                                        Address</label>
+                                    <input type="email" name="email" class="form-control shadow-none"
+                                        value="{{ $user->email ?? old('email') }}" required>
+                                </div>
+
+                                <!-- Field Role & Photo -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Jenis Kelamin</label>
-                                    <select name="jk" class="form-control" required>
-                                        <option value="">-- Pilih --</option>
-                                        <option value="L">Laki-laki</option>
-                                        <option value="P">Perempuan</option>
+                                    <label
+                                        class="form-label text-uppercase text-xs font-weight-bolder opacity-7">Role</label>
+                                    <select name="role" class="form-control shadow-none" required>
+                                        <option value="pustakawan"
+                                            {{ isset($user) && $user->role == 'pustakawan' ? 'selected' : '' }}>
+                                            Pustakawan</option>
+                                        <option value="kepala perpustakaan"
+                                            {{ isset($user) && $user->role == 'kepala perpustakaan' ? 'selected' : '' }}>
+                                            Kepala Perpustakaan</option>
                                     </select>
                                 </div>
 
-                                <!-- Alamat (date sesuai validasi kamu) -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Alamat</label>
-                                    <input type="input" name="alamat" class="form-control" required>
+                                    <label class="form-label text-uppercase text-xs font-weight-bolder opacity-7">Profile
+                                        Photo</label>
+                                    <input type="file" name="photo" class="form-control shadow-none">
                                 </div>
 
-                                <!-- No Telpon -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">No Telepon</label>
-                                    <input type="text" name="no_telpon" class="form-control" required>
+                                <!-- Field Password -->
+                                <div class="col-md-12 mb-4">
+                                    <label class="form-label text-uppercase text-xs font-weight-bolder">Password</label>
+                                    <input type="password" name="password"
+                                        class="form-control @error('password') is-invalid @enderror"
+                                        placeholder="••••••••" minlength="6">
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    @if (isset($user))
+                                        <small class="text-muted text-xs">*Kosongkan jika tidak ingin mengganti
+                                            password</small>
+                                    @endif
                                 </div>
-
-                                <!-- Email -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-control" required>
-                                </div>
-
-                                <!-- Status -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Status</label>
-                                    <select name="status" class="form-control" required>
-                                        <option value="">-- Pilih Status --</option>
-                                        <option value="siswa">Siswa</option>
-                                        <option value="guru">Guru</option>
-                                        <option value="tendik">Tendik</option>
-                                        <option value="umum">Umum</option>
-                                    </select>
-                                </div>
-
-                                <!-- Foto -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Foto</label>
-                                    <input type="file" name="foto" class="form-control shadow-none">
-                                </div>
-
-                                <!-- NIP -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">NIP</label>
-                                    <input type="text" name="nip" class="form-control" required>
-                                </div>
-
-                                <!-- NISN -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">NISN</label>
-                                    <input type="text" name="nisn" class="form-control" required>
-                                </div>
-
-                                <!-- Kelas -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Kelas</label>
-                                    <input type="text" name="kelas" class="form-control" required>
-                                </div>
-
-                                <!-- Tahun Ajaran -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Tahun Ajaran</label>
-                                    <input type="text" name="tahun_ajaran" class="form-control"
-                                        placeholder="2025/2026" required>
-                                </div>
-
                             </div>
 
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" class="btn bg-gradient-dark px-4">
-                                    Submit
-                                </button>
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ route('users.index') }}" class="btn btn-light btn-sm px-4">Cancel</a>
+                                <button type="submit" class="btn bg-gradient-dark btn-sm px-4">Save Changes</button>
                             </div>
-                            
                         </form>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

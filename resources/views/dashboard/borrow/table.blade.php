@@ -53,7 +53,7 @@
                                                 <form action="{{ route('borrow.destroy', $bor->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="delete-btn"
+                                                    <button type="button" class="delete-btn"
                                                         onclick="confirmDelete(this)">
                                                         Delete
                                                     </button>

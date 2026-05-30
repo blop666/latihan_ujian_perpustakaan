@@ -11,6 +11,10 @@ use App\Models\peminjam;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
 
 class PurchaseController extends Controller
 {
@@ -94,13 +98,22 @@ class PurchaseController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        $title = "Purchase";
-        $distributor = distributor::findOrFail($id);
+        $title = "Edit Purchase";
+
+        if (!session()->has('can_edit_purchase_' . $id)) {
+            return redirect()->route('purchase.show-verify', $id)
+                ->with('error', 'Silakan masukkan password otoritas.');
+        }
+
         $purchase = pembelian::findOrFail($id);
 
-        return view('dashboard.purchases.edit', compact('title', 'purchase', 'distributor'));
+        $distributor = distributor::all();
+
+        $books = Book::all();
+
+        return view('dashboard.purchases.edit', compact('title', 'purchase', 'distributor', 'books'));
     }
 
     /**
@@ -108,15 +121,37 @@ class PurchaseController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // 1. Cari data pembelian
         $purchase = pembelian::findOrFail($id);
 
-        $validate = $request([
+        // 2. Validasi data (Perhatikan penggunaan ->validate)
+        $validate = $request->validate([
             'tgl_nota' => 'required|date',
             'id_distributor' => 'required',
-            'total_bayar' => 'required|string|max:20',
+            'total_bayar' => 'required|numeric', 
+            'id_buku' => 'required',
+            'harga_beli' => 'required|numeric',
+            'jumlah_beli' => 'required|integer',
         ]);
 
-        $purchase->update($validate);
+        // 3. Update data di tabel pembelian
+        $purchase->update([
+            'tgl_nota' => $validate['tgl_nota'],
+            'id_distributor' => $validate['id_distributor'],
+            'total_bayar' => $validate['total_bayar'],
+        ]);
+
+        // 4. Update data di tabel detail_pembelian
+        // Kita ambil detail pertama karena form edit kamu fokus pada satu item
+        $detail = $purchase->detail_pembelians()->first();
+
+        if ($detail) {
+            $detail->update([
+                'id_buku' => $validate['id_buku'],
+                'harga_beli' => $validate['harga_beli'],
+                'jumlah_beli' => $validate['jumlah_beli'],
+            ]);
+        }
 
         return redirect()->route('purchase.index')->with('Berhasil', 'Data berhasil diedit');
     }
@@ -125,13 +160,55 @@ class PurchaseController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    { {
-            // Cukup hapus detailnya saja
-            $detail = detail_pembelian::where('id_pembelian', $id)->delete();
-            // Lalu hapus headernya
-            pembelian::destroy($id);
-
-            return redirect()->back()->with('success', 'Data dihapus & stok dikembalikan otomatis oleh Trigger');
+    { // Cek apakah session izin sudah ada
+        if (!session('can_edit_purchase_' . $id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Otoritas diperlukan! Silahkan verifikasi password terlebih dahulu.'
+            ], 403);
         }
+
+        $purchase = pembelian::findOrFail($id);
+        $purchase->delete();
+
+        // Hapus session setelah berhasil delete agar bersih
+        session()->forget('can_edit_purchase_' . $id);
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil dihapus']);
+    }
+
+
+
+    public function verify(Request $request, $id)
+    {
+        // 1. Gunakan Validator manual agar bisa mengontrol respon JSON jika gagal
+        $validator = Validator::make($request->all(), [
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password wajib diisi.'
+            ], 422); // Unprocessable Entity
+        }
+
+        
+        $kepala = User::query()->where('role', 'kepala perpustakaan')->first();
+
+        if ($kepala && Hash::check($request->password, $kepala->password)) {
+            session(['can_edit_purchase_' . $id => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Verifikasi berhasil!'
+            ]);
+        }
+
+        // 4. Respon jika gagal
+        return response()->json([
+            'success' => false,
+            'message' => 'Password salah atau akun kepala perpustakaan tidak ditemukan.'
+        ], 401);
     }
 }
