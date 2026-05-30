@@ -12,9 +12,9 @@ services:
       - DB_DATABASE=dbperpustakaan
       - DB_USERNAME=root
       - DB_PASSWORD=123
-      - SESSION_DRIVER=database
-      - CACHE_STORE=database
-      - QUEUE_CONNECTION=database
+      - SESSION_DRIVER=file
+      - CACHE_STORE=file
+      - QUEUE_CONNECTION=file
     depends_on:
       - db
 
@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
     environment:
       - MYSQL_DATABASE=dbperpustakaan
-      - MYSQL_ROOT_PASSWOD=123
+      - MYSQL_ROOT_PASSWORD=123
     volumes:
       - dbdata:/var/lib/mysql
 
